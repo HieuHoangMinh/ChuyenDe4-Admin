@@ -1,5 +1,5 @@
 import { Component, Injector, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, NumberValueAccessor, Validators } from '@angular/forms';
 import { FileUpload } from 'primeng/fileupload';
 import { MustMatch } from 'src/app/helpers/must-match.validator';
 import { BaseComponent } from 'src/app/lib/base-component';
@@ -74,7 +74,7 @@ response:any;
       });
   }
   getallloai(){
-    this.cates=[]
+    this.cates=[];
     this._api.get('/api/ProductCategory/get-all').takeUntil(this.unsubscribe).subscribe(res=>{
 this.cates=res;
     });
@@ -100,16 +100,18 @@ this.cates=res;
         let data_image = data == '' ? null : data;
         let tmp = {
            image_url:data_image,
-           hoten:value.hoten,
-           diachi:value.diachi,
-           gioitinh:value.gioitinh,
-           email:value.email,
-           taikhoan:value.taikhoan,
-           matkhau:value.matkhau,
-           role:value.role,
-           ngaysinh:value.ngaysinh
-          };
-        this._api.post('/api/products/create-product',tmp).takeUntil(this.unsubscribe).subscribe(res => {
+           name:value.tensanpham,
+           metaTitle:value.tensanpham.replace(/ /gi, "-"),
+           categoryID:Number.parseInt(value.categoryID),
+           description:value.mota,
+           detail:value.chitiet,
+           price:Number.parseFloat(value.gia),
+           quantity:Number.parseInt(value.quantity),
+           promotionPrice:Number.parseFloat(value.giakm),
+           metaKeywords:value.tensanpham+','+'đồ án 5',
+           metaDescriptions:value.mota.replace(/./gi, ",")
+          };console.log(tmp);
+        this._api.post('/api/product/create-item',tmp).takeUntil(this.unsubscribe).subscribe(res => {
           alert('Thêm thành công');
           this.search();
           this.closeModal();
@@ -119,18 +121,20 @@ this.cates=res;
       this.getEncodeFromImage(this.file_image).subscribe((data: any): void => {
         let data_image = data == '' ? null : data;
         let tmp = {
-           image_url:data_image,
-           hoten:value.hoten,
-           diachi:value.diachi,
-           gioitinh:value.gioitinh,
-           email:value.email,
-           taikhoan:value.taikhoan,
-           matkhau:value.matkhau,
-           role:value.role,
-           ngaysinh:value.ngaysinh ,
-           product_id:this.product.product_id,
+          image_url:data_image,
+           name:value.tensanpham,
+           metaTitle:value.tensanpham.replace(/ /gi, "-"),
+           categoryID:Number.parseInt(value.categoryID),
+           description:value.mota,
+           detail:value.chitiet,
+           price:Number.parseFloat(value.gia),
+           quantity:Number.parseInt(value.quantity),
+           promotionPrice:Number.parseFloat(value.giakm),
+           metaKeywords:value.tensanpham+','+'đồ án 5',
+           metaDescriptions:value.tensanpham.mota(/./gi, ",")
           };
-        this._api.post('/api/products/update-product',tmp).takeUntil(this.unsubscribe).subscribe(res => {
+
+        this._api.post('/api/product/update-product',tmp).takeUntil(this.unsubscribe).subscribe(res => {
           alert('Cập nhật thành công');
           this.search();
           this.closeModal();
@@ -141,7 +145,7 @@ this.cates=res;
   }
 
   onDelete(row) {
-    this._api.post('/api/products/delete-product',{product_id:row.product_id}).takeUntil(this.unsubscribe).subscribe(res => {
+    this._api.post('/api/product/delete-product',{product_id:row.product_id}).takeUntil(this.unsubscribe).subscribe(res => {
       alert('Xóa thành công');
       this.search();
       });
@@ -150,18 +154,15 @@ this.cates=res;
   Reset() {
     this.product = null;
     this.formdata = this.fb.group({
-      'hoten': ['', Validators.required],
-      'ngaysinh': [this.today, Validators.required],
-      'diachi': [''],
-      'gioitinh': [this.genders[0].value, Validators.required],
-      'email': ['', [Validators.required,Validators.email]],
-      'taikhoan': ['', Validators.required],
-      'matkhau': ['', [this.pwdCheckValidator]],
-      'nhaplaimatkhau': ['', Validators.required],
-      'role': [this.roles[0].value, Validators.required],
-    }, {
-      validator: MustMatch('matkhau', 'nhaplaimatkhau')
-    });
+      'tensanpham': ['', Validators.required],
+      'categoryID': ['', Validators.required],
+      'mota': [''],
+      'chitiet': [''],
+      'quantity': [0, Validators.required],
+      'gia': [0, Validators.required],
+      'giakm': [0 ]
+    }
+);
   }
 
   createModal() {
@@ -172,21 +173,16 @@ this.cates=res;
     setTimeout(() => {
       $('#createproductModal').modal('toggle');
       this.formdata = this.fb.group({
-        'hoten': ['', Validators.required],
-        'ngaysinh': ['', Validators.required],
-        'diachi': [''],
-        'gioitinh': ['', Validators.required],
-        'email': ['', [Validators.required,Validators.email]],
-        'taikhoan': ['', Validators.required],
-        'matkhau': ['', [this.pwdCheckValidator]],
-        'nhaplaimatkhau': ['', Validators.required],
-        'role': ['', Validators.required],
-      }, {
-        validator: MustMatch('matkhau', 'nhaplaimatkhau')
+        'tensanpham': ['', Validators.required],
+        'categoryID': ['', Validators.required],
+        'mota': [''],
+        'chitiet': [''],
+        'quantity': [0, Validators.required],
+        'gia': [0, Validators.required],
+        'giakm': [0 ]
+
       });
-      this.formdata.get('ngaysinh').setValue(this.today);
-      this.formdata.get('gioitinh').setValue(this.genders[0].value);
-      this.formdata.get('role').setValue(this.roles[0].value);
+
       this.doneSetupForm = true;
     });
   }
@@ -197,21 +193,17 @@ this.cates=res;
     this.isCreate = false;
     setTimeout(() => {
       $('#createproductModal').modal('toggle');
-      this._api.get('/api/products/get-by-id/'+ row.product_id).takeUntil(this.unsubscribe).subscribe((res:any) => {
+      this._api.get('/api/product/get-by-id/'+ row.product_id).takeUntil(this.unsubscribe).subscribe((res:any) => {
         this.product = res;
-        let ngaysinh = new Date(this.product.ngaysinh);
+        // let ngaysinh = new Date(this.product.ngaysinh);
           this.formdata = this.fb.group({
-            'hoten': [this.product.hoten, Validators.required],
-            'ngaysinh': [ngaysinh, Validators.required],
-            'diachi': [this.product.diachi],
-            'gioitinh': [this.product.gioitinh, Validators.required],
-            'email': [this.product.email, [Validators.required,Validators.email]],
-            'taikhoan': [this.product.taikhoan, Validators.required],
-            'matkhau': [this.product.matkhau, [this.pwdCheckValidator]],
-            'nhaplaimatkhau': [this.product.matkhau, Validators.required],
-            'role': [this.product.role, Validators.required],
-          }, {
-            validator: MustMatch('matkhau', 'nhaplaimatkhau')
+            'tensanpham': [this.product.name, Validators.required],
+        'categoryID': [this.product, Validators.required],
+        'mota': [this.product.description],
+        'chitiet': [this.product.detail],
+        'gia': [this.product.price, Validators.required],
+        'quantity': [0, Validators.required],
+        'giakm': [this.product.promotionPrice],
           });
           this.doneSetupForm = true;
         });
