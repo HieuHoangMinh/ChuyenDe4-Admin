@@ -96,6 +96,15 @@
         <form *ngIf="doneSetupForm" [formGroup]="formdata"  (ngSubmit)="onSubmit(formdata.value)" class="form-horizontal utehy-form">
           <div class="modal-body no-padding">
             <div class="form-group">
+              <ng-container *ngIf="!isCreate">
+              <label class="col-sm-2 control-label no-padding-right">Mã sản phẩm(<span style="color: red;">*</span>)</label>
+              <div class="col-sm-3">
+                <input type="text" placeholder="" readonly formControlName="id"/>
+                <div *ngIf="submitted && f.id.errors" class="invalid-feedback">
+                  <div *ngIf="f.id.errors.required">Tên sản phẩm bắt buộc</div>
+                </div>
+              </div>
+            </ng-container>
               <label class="col-sm-2 control-label no-padding-right">Tên sản phẩm(<span style="color: red;">*</span>)</label>
               <div class="col-sm-5">
                 <input type="text" placeholder="Họ tên" formControlName="tensanpham"/>
@@ -109,7 +118,7 @@
               <label class="col-sm-2 control-label no-padding-right"> Loại sản phẩm</label>
               <div class="col-sm-5">
                <select formControlName="categoryID">
-                 <option value="" selected>Chọn một loại</option>
+
                  <option *ngFor="let l of cates" [value]="l.id">{{l.name}}</option>
                </select>
               </div>
@@ -140,13 +149,13 @@
             <div class="form-group">
               <label class="col-sm-2 control-label no-padding-right">Số lượng</label>
               <div class="col-sm-10">
-                <input type="text" formControlName="gia" placeholder="Giá" />
+                <input type="text" formControlName="quantity" placeholder="Số lượng" />
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-2 control-label no-padding-right">Giá</label>
               <div class="col-sm-10">
-                <input type="text" formControlName="quantity" placeholder="Giá" />
+                <input type="text" formControlName="gia" placeholder="Giá" />
               </div>
             </div>
             <div class="form-group">

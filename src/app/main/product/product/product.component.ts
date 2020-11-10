@@ -99,7 +99,7 @@ this.cates=res;
       this.getEncodeFromImage(this.file_image).subscribe((data: any): void => {
         let data_image = data == '' ? null : data;
         let tmp = {
-           image_url:data_image,
+           image:data_image,
            name:value.tensanpham,
            metaTitle:value.tensanpham.replace(/ /gi, "-"),
            categoryID:Number.parseInt(value.categoryID),
@@ -121,7 +121,8 @@ this.cates=res;
       this.getEncodeFromImage(this.file_image).subscribe((data: any): void => {
         let data_image = data == '' ? null : data;
         let tmp = {
-          image_url:data_image,
+          image:data_image,
+          id:value.id,
            name:value.tensanpham,
            metaTitle:value.tensanpham.replace(/ /gi, "-"),
            categoryID:Number.parseInt(value.categoryID),
@@ -131,11 +132,12 @@ this.cates=res;
            quantity:Number.parseInt(value.quantity),
            promotionPrice:Number.parseFloat(value.giakm),
            metaKeywords:value.tensanpham+','+'đồ án 5',
-           metaDescriptions:value.tensanpham.mota(/./gi, ",")
+           metaDescriptions:value.mota.replace(/./gi, ",")
           };
 
-        this._api.post('/api/product/update-product',tmp).takeUntil(this.unsubscribe).subscribe(res => {
+        this._api.post('/api/product/update-item',tmp).takeUntil(this.unsubscribe).subscribe(res => {
           alert('Cập nhật thành công');
+          console.log(tmp);
           this.search();
           this.closeModal();
           });
@@ -145,10 +147,14 @@ this.cates=res;
   }
 
   onDelete(row) {
-    this._api.post('/api/product/delete-product',{product_id:row.product_id}).takeUntil(this.unsubscribe).subscribe(res => {
+    this._api.get('/api/product/delete-product/'+ row.id).takeUntil(this.unsubscribe).subscribe(res => {
       alert('Xóa thành công');
       this.search();
       });
+    // this._api.post('/api/product/delete-product',{id:row.id}).takeUntil(this.unsubscribe).subscribe(res => {
+    //   alert('Xóa thành công');
+    //   this.search();
+    //   });
   }
 
   Reset() {
@@ -193,12 +199,13 @@ this.cates=res;
     this.isCreate = false;
     setTimeout(() => {
       $('#createproductModal').modal('toggle');
-      this._api.get('/api/product/get-by-id/'+ row.product_id).takeUntil(this.unsubscribe).subscribe((res:any) => {
+      this._api.get('/api/product/get-by-id/'+ row.id).takeUntil(this.unsubscribe).subscribe((res:any) => {
         this.product = res;
         // let ngaysinh = new Date(this.product.ngaysinh);
           this.formdata = this.fb.group({
+            'id': [this.product.id, Validators.required],
             'tensanpham': [this.product.name, Validators.required],
-        'categoryID': [this.product, Validators.required],
+        'categoryID': [this.product.categoryID, Validators.required],
         'mota': [this.product.description],
         'chitiet': [this.product.detail],
         'gia': [this.product.price, Validators.required],
