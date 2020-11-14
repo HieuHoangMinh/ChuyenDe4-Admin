@@ -1,20 +1,362 @@
-<div class="breadcrumbs" id="breadcrumbs">
-    <ul class="breadcrumb">
-      <li>
-        <i class="ace-icon fa fa-home home-icon"></i>
-        <a href="#">Trang chủ</a>
-      </li>
-      <li class="active">Quản lý đơn hàng</li>
-    </ul><!-- /.breadcrumb -->
-  </div>
-  <div class="page-content"> 
-    <div class="row">
-      <div class="col-xs-12">
-        <!-- PAGE CONTENT BEGINS --> 
-        Hi
+<!-- Content Wrapper. Contains page content -->
 
-        <!-- PAGE CONTENT ENDS -->
-      </div><!-- /.col -->
-    </div><!-- /.row -->
-  </div><!-- /.page-content -->
- 
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Quản lý đơn hàng</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
+            <li class="breadcrumb-item active">Đơn hàng</li>
+          </ol>
+        </div>
+      </div>
+    </div><!-- /.container-fluid -->
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+      <div class="card-header">
+        <!-- <h3 class="card-title">Đơn hàng</h3> -->
+         <!-- <select  class="col-md-3 form-control" >
+           <ng-container *ngFor="let i of status">
+             <option>  <button (click)="filterBill(i.id)">{{ i.name }}</button></option>
+           </ng-container>
+         </select> -->
+          <div class="btn-group">
+                <button type="button" class="btn  btn-sm btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Lọc đơn hàng</button>
+                        <div class="dropdown-menu">
+
+                      <ng-container *ngFor="let i of status">
+                        <a class="dropdown-item"(click)="filterBill(i.id)"> <i class="fas fa-ban"> </i>  {{i.shipName}}</a>
+                      </ng-container>
+                      </div>
+               </div>
+               <button class="btn btn-sm btn-primary" (click)="exportExcel()">Export excel</button>
+
+
+
+
+    <div class="card-tools">
+    <div class="input-group input-group-md" >
+    <input class="form-control" [(ngModel)]="term" type="text" placeholder="Nhập thông tin..." >
+    <div class="input-group-append">
+      <button class="btn btn-info btn-md" type="submit">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+    </div>
+  </div>
+          <!-- <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+            <i class="fas fa-minus"></i></button>
+          <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove">
+            <i class="fas fa-times"></i></button>
+        </div> -->
+      </div>
+
+
+      <div class="card-body p-0">
+        <table class="table table-striped projects table">
+            <thead>
+                <tr>
+                    <th>
+                        STT
+                    </th>
+                    <th>
+                       Tên người nhận
+                    </th>
+                    <th>
+                        Số điện thoại
+                    </th>
+                    <!-- <th>
+                       Tổng tiền
+                    </th> -->
+                    <th>
+                        Ngày lập
+                    </th>
+                      <th>
+                        Trạng thái
+                    </th>
+                    <th> Thao tác
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+
+
+              <ng-container *ngFor="let item of list_order ; let i = index">
+
+                <tr>
+                    <td>
+                       {{ i + 1 }}
+                    </td>
+                    <td>
+                       {{item.shipName}}
+                    </td>
+                    <td>
+                     {{item.shipMobile}}
+                    </td>
+                    <!-- <td>
+                      {{ item.total |number }} VNĐ
+                    </td> -->
+                    <td>
+                      {{ item.createDate | date:'dd/M/y'}}
+                    </td>
+                    <td class="project-state">
+
+                  <ng-container [ngSwitch]="item.status">
+                     <span class="badge badge-danger" *ngSwitchCase="0">Đơn đã hủy</span>
+                      <span class="badge badge-primary" *ngSwitchCase="1">Tiếp nhận đơn</span>
+                      <span class="badge badge-secondary" *ngSwitchCase="2">Đã xác thực</span>
+                      <span class="badge badge-success" *ngSwitchCase="3">Đã chuyển giao</span>
+                  </ng-container>
+                        <!-- <span class="badge badge-success">Success</span> -->
+                    </td>
+                    <td class="project-actions text-left">
+                        <button class="btn btn-primary btn-sm" data-id="item.id" (click)="ViewDetail(item.id)">
+                            <i class="fas fa-eye">
+                            </i>
+                            Xem chi tiết
+                        </button>
+                        &nbsp;
+
+
+
+              <div class="btn-group">
+                <button type="button" class="btn  btn-sm btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Thao tác</button>
+                        <div class="dropdown-menu">
+                       <a  class="dropdown-item" (click)="deleteBill(item.id)">
+                            <i class="fas fa-trash">
+                            </i>
+                            Xóa đơn hàng
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item"  (click)="changeStatus( item.id,'process')">
+                           <i class="fas fa-ban"> </i>  Đã xác thực</a>
+                        <a class="dropdown-item"(click)="changeStatus(item.id,'success')"> <i class="fas fa-ban"> </i>  Đã chuyển giao</a>
+                        <a class="dropdown-item"(click)="changeStatus(item.id,'danger')"> <i class="fas fa-ban"> </i>   Đã hủy</a>
+
+                      </div>
+               </div>
+
+                    </td>
+                </tr>
+                </ng-container>
+
+
+            </tbody>
+        </table>
+      </div>
+      <!-- /.card-body -->
+    </div>
+     <div style="text-align: right;">
+
+
+    </div>
+
+  </section>
+  <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+<!-- Button trigger modal-->
+
+
+<!-- Modal: modalCart -->
+<div class="modal fade" id="myBill" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+aria-hidden="true">
+<div class="modal-dialog modal-lg" role="document">
+  <div class="modal-content">
+    <!--Header-->
+    <div class="modal-header">
+      <h4 class="modal-title" id="myModalLabel">Chi tiết đơn hàng</h4>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <!--Body-->
+    <div class="modal-body">
+
+      <table class="table table-hover">
+        <thead>
+          <tr style="border-top:none">
+            <th>STT</th>
+            <th>Tên sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Giá</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let s of order_detail; let i = index">
+          <tr>
+            <th scope="row">{{ i + 1 }}</th>
+            <td>{{ s.name }}</td>
+            <td>{{ s.quantity_sale }}</td>
+            <td>{{ s.price | number}} VNĐ</td>
+          </tr>
+          </ng-container>
+
+
+        </tbody>
+      </table>
+
+    </div>
+    <!--Footer-->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Đóng</button>
+
+       <button
+         styleSheetFile="assets/dist/css/adminlte.min.css"
+        printSectionId="in" class="btn btn-info" ngxPrint>In</button>
+    </div>
+  </div>
+</div>
+</div>
+<!-- Modal: modalCart -->
+
+<div id="confirmModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h2 class="modal-title">Thông báo!</h2>
+          </div>
+          <div class="modal-body">
+              <h4 align="center" style="margin:0;">Bạn có chắc chắc muốn xóa đơn hàng này không!</h4>
+          </div>
+          <div class="modal-footer">
+           <button type="button" name="ok_button" id="ok_button" class="btn btn-danger">OK</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+          </div>
+      </div>
+  </div>
+</div>
+<ng-container  *ngIf="hidden == true">
+
+<section class="invoice" id="in">
+  <!-- title row -->
+  <div class="row">
+    <div class="col-12">
+      <h2 class="page-header">
+        <i class="fas fa-globe"></i>Công ty THHH Phụ Kiện.
+        <small class="float-right">Ngày Lập: {{day }}</small>
+      </h2>
+    </div>
+    <!-- /.col -->
+  </div>
+  <!-- info row -->
+  <div class="row invoice-info">
+    <div class="col-sm-4 invoice-col">
+      Từ
+      <address>
+        <strong>Cửa hàng công ty Phụ Kiện.</strong><br>
+        Ngã tư Phố Nối, Mỹ Hào, Hưng Yên<br>
+        Điện thoại: 03938292<br>
+        Email: phukiendientu.com
+      </address>
+    </div>
+    <!-- /.col -->
+    <div class="col-sm-4 invoice-col">
+      Đến
+      <address>
+        <strong>{{order_detail.customer_name}}</strong><br>
+        795 Folsom Ave, Suite 600<br>
+        San Francisco, CA 94107<br>
+        Phone: (555) 539-1037<br>
+        Email: john.doe@example.com
+      </address>
+    </div>
+    <!-- /.col -->
+    <div class="col-sm-4 invoice-col">
+      <b>Mã hóa đơn {{order_detail.bill_id}}</b><br>
+      <br>
+      <!-- <b>Order ID:</b> 4F3S8J<br> -->
+      <b>Ngày lập:</b>{{day}}<br>
+      <!-- <b>Account:</b> 968-34567 -->
+    </div>
+    <!-- /.col -->
+  </div>
+  <!-- /.row -->
+
+  <!-- Table row -->
+  <div class="row">
+    <div class="col-12 table-responsive">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>STT</th>
+          <th>Tên sản phẩm</th>
+          <th>Số lượng</th>
+          <th>Giá sản phẩm</th>
+
+        </tr>
+        </thead>
+        <tbody>
+         <ng-container *ngFor="let s of order_detail; let i = index">
+          <tr>
+            <th scope="row">{{ i + 1 }}</th>
+            <td>{{ s.name }}</td>
+            <td>{{ s.quantity_sale }}</td>
+            <td>{{ s.price | number}} VNĐ</td>
+          </tr>
+          </ng-container>
+
+
+        </tbody>
+      </table>
+    </div>
+    <!-- /.col -->
+  </div>
+  <!-- /.row -->
+
+  <div class="row">
+    <!-- accepted payments column -->
+    <div class="col-6">
+      <p class="lead">Phương thức thanh toán:</p>
+      <img src="../../dist/img/credit/visa.png" alt="Visa">
+      <img src="../../dist/img/credit/mastercard.png" alt="Mastercard">
+      <img src="../../dist/img/credit/american-express.png" alt="American Express">
+      <img src="../../dist/img/credit/paypal2.png" alt="Paypal">
+
+      <p class="text-muted well well-sm shadow-none" style="margin-top: 10px;">
+
+      </p>
+    </div>
+    <!-- /.col -->
+    <div class="col-6">
+      <p class="lead">Ngày lập {{order_detail.created_at}}</p>
+
+      <div class="table-responsive">
+        <table class="table">
+          <tr>
+            <th style="width:50%">Tổng tiền:</th>
+            <td>{{order_detail.total| number}} VNĐ</td>
+          </tr>
+          <tr>
+            <th>Thuế</th>
+            <td>0</td>
+          </tr>
+          <tr>
+            <th>Phí vận chuyển </th>
+            <td>0</td>
+          </tr>
+          <tr>
+            <th>Tổng tiền:</th>
+            <td>{{order_detail.total| number}} VNĐ</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <!-- /.col -->
+  </div>
+  <!-- /.row -->
+</section>
+</ng-container>
